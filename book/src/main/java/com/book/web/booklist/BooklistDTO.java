@@ -5,6 +5,6 @@ import lombok.Data;
 @Data
 public class BooklistDTO {
 
-	private int bkno, bkprice,rcnt,bcnt,bstock,rstock;
-	private String bkname, bkwrite, bkcontent, bkimg;
+	private int bkno, bkprice,rcnt,bcnt,bstock,rstock, rdel;
+	private String bkname, bkwrite, bkcontent, bkimg, rsdate, rddate;
 }

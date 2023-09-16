@@ -8,14 +8,14 @@
 		WHERE mid=#{id} AND mpw=#{pw}
 	</select>
 
-	<select id="hasKakaoUser" parameterType="Map" resultType="Integer">
-		SELECT count(*)  
+	<select id="hasKakaoUser" parameterType="Map" resultType="Map">
+		SELECT count(*) as count, mname  
 		FROM members
 		WHERE memail=#{kemail} AND mconnect=1
 	</select>
 	
 	<select id="hasNaverUser" parameterType="Map" resultType="Integer">
-		SELECT count(*)  
+		SELECT count(*) as count, mname  
 		FROM members
 		WHERE memail=#{Nemail} AND mconnect=2
 	</select>
@@ -26,8 +26,8 @@
 		WHERE mid=#{mid}
 	</update>
 
-	<select id="hasAuto" parameterType="Map" resultType="Integer">
-		SELECT auto
+	<select id="hasAuto" parameterType="Map" resultType="Map">
+		SELECT auto, mname
 		FROM members
 		WHERE mid=#{sid}
 	</select>

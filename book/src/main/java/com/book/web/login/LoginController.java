@@ -58,15 +58,16 @@ public class LoginController {
 	public String login(@RequestParam Map<String, Object> map, HttpSession session) {
 			JSONObject json = new JSONObject();
 			
-			System.out.println(map); 
-			int auto = loginService.hasAuto(map); // sid, setS
+			System.out.println(map); // sid, setS
+			Map<String, Object> auto = loginService.hasAuto(map); // auto, name
 			System.out.println("auto값 : " + auto);
 
-			if(auto == 1) {	// 자동로그인체크 + 계정일치
+			if(Integer.parseInt(String.valueOf(auto.get("auto"))) == 1) {	// 자동로그인체크 + 계정일치
 				if(map.get("setS") != null) {
 					
 					session.setAttribute("mid", map.get("sid"));
-					System.out.println("자동로그인완");
+					session.setAttribute("mname", auto.get("mname"));
+					//System.out.println("자동로그인완");
 					json.put("auto", auto); // auto = 1
 					return json.toString();
 				} 
@@ -130,19 +131,21 @@ public class LoginController {
 			// System.out.println(kUser); // {kid=3002751483, kemail=gogus228@hanmail.net}
 
 			// kakao 로그인기록 확인
-			int result = loginService.hasKakaoUser(kUser);	// 0 또는 1
+			Map<String, Object> result = loginService.hasKakaoUser(kUser);	// 0 또는 1
 
 			if (kUser != null) { // kakao연결성공
 
-				if (result == 1) {
+				if (Integer.parseInt(String.valueOf(result.get("result"))) == 1) {
 					// db에 kakao계정정보 있다면 로그인진행
 					session.setAttribute("mid", kUser.get("kid"));
+					session.setAttribute("mname", result.get("mname"));
 					session.setAttribute("withK", "1");	// 로그아웃시 활용
 					return "redirect:/";
 
 				} else {
 					//db에 kakao계정정보 없다면 생성(id&email) => subjoin에서 진행
 					session.setAttribute("mid", kUser.get("kid")); 		// kid 세션에 저장
+					session.setAttribute("mname", result.get("mname"));
 					session.setAttribute("withK", "1");					// 로그아웃시 활용
 					model.addAttribute("memail", kUser.get("kemail")); 	// db에 넣을 추가정보
 					
@@ -162,7 +165,7 @@ public class LoginController {
 			//System.out.println(code);	
 			String Naccess_Token = loginService.getNaverToken(code);
 			Map<String, Object> nUser = loginService.getNaverUser(Naccess_Token); // 서비스에서 리턴한 Nmap값을 nUser로 받음.
-			//System.out.println(nUser);
+			System.out.println(nUser);
 			
 			// 네이버 로그인기록 확인
 			int result = loginService.hasNaverUser(nUser); // 0 또는 1
@@ -172,16 +175,17 @@ public class LoginController {
 				// db에 naver 계정정보 있다면 로그인진행
 				if(result == 1) {
 					session.setAttribute("mid", nUser.get("Nid"));
+					session.setAttribute("mname", nUser.get("Nname"));
 					session.setAttribute("withN", "2");	// 로그아웃시 활용
 					return "redirect:/";
 					
 				} else {	
 					// db에 naver계정정보 없다면 생성(id&email&name&phone) => subjoin에서 진행
 					session.setAttribute("mid", nUser.get("Nid")); 		// Nid 세션에 저장
+					session.setAttribute("mname", nUser.get("Nname"));	// Nname 세션에 저장
 					session.setAttribute("withN", "2");					// 로그아웃시 활용
 					
 					model.addAttribute("memail", nUser.get("Nemail"));	// db에 넣을 추가정보들
-					model.addAttribute("mname", nUser.get("Nname"));
 					model.addAttribute("mphone", nUser.get("Nphone"));
 					return "subjoin";
 				}

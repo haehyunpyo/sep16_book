@@ -73,9 +73,167 @@
 
       zHeart1 = !zHeart1;
     }
+
+    /*--------------------------승현-----------------------------------*/
+
+      //날짜 제한
+      $(function () {
+		 	if(${rentaldata.rdel} == 0){
+			 	let today = new Date();
+			    let dd = String(today.getDate()).padStart(2, '0');
+			    let mm = String(today.getMonth() + 1).padStart(2, '0'); // 1월은 0으로 시작하므로 +1
+			    let yyyy = today.getFullYear();
+			    
+			    today = yyyy + '-' + mm + '-' + dd;
+			
+			    // 대여일 입력 필드에 현재 날짜 이후로만 입력하도록 설정
+			    document.getElementById('rsdate').setAttribute('min', today);
+			    
+		      
+			 // 대여일 입력 이벤트 처리
+			    $("#rsdate").change(function () {
+			        let rsdate = $(this).val(); // 대여일
+			        let rddateInput = $("#rddate");
+			        
+			        if (rsdate) {
+			            let maxRddate = new Date(rsdate);
+			            maxRddate.setDate(maxRddate.getDate() +7); // 대여일로부터 7일 이후
+		
+			            // 반납일 입력 필드에 대여일로부터 7일 이후까지만 입력하도록 설정
+			            let maxRddateStr = formatDate(maxRddate);
+			            rddateInput.attr('max', maxRddateStr);
+			        } else {
+			            // 대여일을 선택하지 않았을 경우 반납일 제한 없음
+			            rddateInput.removeAttr('max');
+			        }
+				    document.getElementById('rddate').setAttribute('min', rsdate);
+			    });
+		
+			    function formatDate(date) {
+			        let dd = String(date.getDate()).padStart(2, '0');
+			        let mm = String(date.getMonth() + 1).padStart(2, '0');
+			        let yyyy = date.getFullYear();
+			        return yyyy + '-' + mm + '-' + dd;
+		    }
+			    
+	 		} else {
+	 			let rddateStr = '${rentaldata.rddate}'; // 예: "2023-09-18"
+	 			let rddate = new Date(rddateStr);
+			    let dd = String(rddate.getDate()).padStart(2, '0');
+			    let mm = String(rddate.getMonth() + 1).padStart(2, '0'); // 1월은 0으로 시작하므로 +1
+			    let yyyy = rddate.getFullYear();
+			    
+			    rddate = yyyy + '-' + mm + '-' + dd;
+			
+			    // 대여일 입력 필드에 현재 날짜 이후로만 입력하도록 설정
+			    document.getElementById('rsdate').setAttribute('min', rddate);
+			    
+		      
+			 // 대여일 입력 이벤트 처리
+			    $("#rsdate").change(function () {
+			        let rsdate = $(this).val(); // 대여일
+			        let rddateInput = $("#rddate");
+			        
+			        if (rsdate) {
+			            let maxRddate = new Date(rsdate);
+			            maxRddate.setDate(maxRddate.getDate() +7); // 대여일로부터 7일 이후
+
+			            // 반납일 입력 필드에 대여일로부터 7일 이후까지만 입력하도록 설정
+			            let maxRddateStr = formatDate(maxRddate);
+			            rddateInput.attr('max', maxRddateStr);
+			        } else {
+			            // 대여일을 선택하지 않았을 경우 반납일 제한 없음
+			            rddateInput.removeAttr('max');
+			        }
+				    document.getElementById('rddate').setAttribute('min', rsdate);
+			    });
+
+			    function formatDate(date) {
+			        let dd = String(date.getDate()).padStart(2, '0');
+			        let mm = String(date.getMonth() + 1).padStart(2, '0');
+			        let yyyy = date.getFullYear();
+			        return yyyy + '-' + mm + '-' + dd;
+	 			}
+	 		}
+	});
     
-    
-    </script>
+	 //책 대여
+      $(function(){
+         $("#rental").click(function(){
+            let rddate = $("#rddate").val();
+            let rsdate = $("#rsdate").val();
+            let bkno = ${bookdetail.bkno };
+        	let rdel = ${rentaldata.rdel };
+      
+        	//alert(rsddate, rddate);
+
+        if (rsdate === "" && rddate === "") {
+            alert("날짜를 입력하세요.");
+        } else if (rsdate === "") {
+            alert("대여일을 입력하세요.");
+        } else if (rddate === "") {
+            alert("반납일을 입력하세요.");
+        } else {
+            $.ajax({
+               url : "./rental",
+               type : "POST",
+               data : {"rsdate" : rsdate, "rddate" : rddate,   "bkno" : bkno},
+               dataType : "json",
+               success : function(data) {
+                  //alert(data.result);
+                  if(data.result == 1){
+               			 alert("대여가 완료 되었습니다"); 
+                		  
+                  } else {
+                     alert("로그인 후 이용 가능합니다.");
+                  }
+               },
+               error : function(request, status, error) {
+                  alert("대여실패 : " + error);
+               }
+            });
+        }
+
+         });
+      });
+     //반납하기
+     $(function(){
+    	 $("#returnBook").click(function(){
+    		 let rddate = ${rentaldata.rddate };
+    		 let rsddate = ${rentaldata.rsdate };
+             let bkno = ${bookdetail.bkno };
+         	 let rdel = ${rentaldata.rdel };
+         	 let mid = "${sessionScope.mid}";
+         	 
+         	 alert(mid);
+         	 $.ajax({
+                 url : "./returnBook",
+                 type : "POST",
+                 data : {"bkno" : bkno, "rdel" : rdel, "mid" : mid },
+                 dataType : "json",
+                 success: function(data) {
+                	 if(data.returnBook == 1){
+                		  alert("반납성공");
+                	 } else {
+                		 alert("반납실패");
+                	 }
+                	   
+                	},
+                 error : function(request, status, error) {
+                	 alert("에러입니다" + error);
+                	  console.log("에러 발생: " + request);
+                 }
+              });
+    	 }); 
+    });
+     
+     /*-----------------------------------------------------------------*/
+
+     
+   </script>
+
+
+
   </head>
   <body data-spy="scroll" data-target=".onpage-navigation" data-offset="60">
   <%@ include file="menu.jsp"%>
@@ -118,37 +276,82 @@
                    <li class="active"><a href="#buy" data-toggle="tab">구매</a></li>
                    <li><a href="#trade" data-toggle="tab">대여</a></li>
                   </ul>
-                  
-                <div class="tab-content">
-                
-                <div class="tab-pane active" id="buy">
-                 <form action="./cart" method="post" id="form">
-                    <input type="hidden" name="bkimg" value="${bookdetail.bkimg }">
-                    <input type="hidden" name="price" value="${bookdetail.bkprice }">
-                    <input type="hidden" name="bkno" value="${bookdetail.bkno }">
-                    <textarea name="bkscontent" style=display:none>${bookdetail.bkscontent }</textarea> 
-                    
-                 <c:if test="${sessionScope.mid ne null }">
-                   <div class="col-sm-4 mb-sm-20">
-                     <input class="form-control input-lg" type="number" name="amount"  max="${detail.bstock }" min="1" required="required"/>
-                    </div>
-                   <div class="col-sm-8"><button class="btn btn-lg btn-block btn-round btn-b" type="submit">장바구니 담기</button></div>
-                  </c:if> 
-                 </form>
-                </div>
-                
-                 <div class="tab-pane" id="trade">
-                  <div class="col-sm-6 mb-sm-20">
-                    대여일<input class="form-control input-lg" type="date" name="" value="1" max="40" min="1" required="required"/>
-                  </div>
-                  <div class="col-sm-6 mb-sm-20">
-                    반납일<input class="form-control input-lg" type="date" name="" value="1" max="40" min="1" required="required"/>
-                  </div>
-                    <div class="col-sm-12"><br><a class="btn btn-lg btn-block btn-round btn-b" href="#">대여하기</a></div>
-                  </div>
-                  
-                </div> 
-                </div> 
+
+								<div class="tab-content">
+
+									<div class="tab-pane active" id="buy">
+										<form action="./cart" method="post" id="form">
+											<input type="hidden" name="bkimg"
+												value="${bookdetail.bkimg }"> <input type="hidden"
+												name="price" value="${bookdetail.bkprice }"> <input
+												type="hidden" name="bkno" value="${bookdetail.bkno }">
+											<textarea name="bkscontent" style="display: none">${bookdetail.bkscontent }</textarea>
+
+											<c:if test="${sessionScope.mid ne null }">
+												<div class="col-sm-4 mb-sm-20">
+													<input class="form-control input-lg" type="number"
+														name="amount" max="${detail.bstock }" min="1"
+														required="required" />
+												</div>
+												<div class="col-sm-8">
+													<button class="btn btn-lg btn-block btn-round btn-b"
+														type="submit">장바구니 담기</button>
+												</div>
+											</c:if>
+										</form>
+									</div>
+    
+	<!-- --------------------------대여&반납----------------------------------- -->
+
+									<div class="tab-pane" id="trade">
+										<c:if test="${rentaldata.rdel eq 0 }">
+											<div class="col-sm-6 mb-sm-20">
+												대여일<input class="form-control input-lg" type="date"
+													id="rsdate" name="rsdate" required="required" />
+											</div>
+											<div class="col-sm-6 mb-sm-20">
+												반납일<input class="form-control input-lg" type="date"
+													id="rddate" name="rddate" required="required" />
+											</div>
+											<div class="col-sm-12">
+												<br>
+												<a class="btn btn-lg btn-block btn-round btn-b" href="#"
+													id="rental">대여하기</a>
+											</div>
+										</c:if>
+
+										<c:if test="${rentaldata.rdel eq 1 }">
+
+											<div>${rentaldata.rddate }일이후부터 대여가능</div>
+
+											<div class="col-sm-6 mb-sm-20">
+												대여일<input class="form-control input-lg" type="date"
+													id="rsdate" name="rsdate" required="required" />
+											</div>
+											<div class="col-sm-6 mb-sm-20">
+												반납일<input class="form-control input-lg" type="date"
+													id="rddate" name="rddate" required="required" />
+											</div>
+											<div class="col-sm-12">
+												<br>
+												<a class="btn btn-lg btn-block btn-round btn-b" href="#"
+													id="rental">대여하기</a>
+											</div>
+											<c:if
+												test="${rentaldata.rdel == 1 && sessionScope.mid == rentaldata.mid}">
+												<div class="col-sm-12">
+													<br>
+													<a class="btn btn-lg btn-block btn-round btn-b" href="#"
+														id="returnBook">반납하기</a>
+												</div>
+											</c:if>
+										</c:if>
+									</div>
+
+								</div>
+							</div> 
+	<!-- --------------------------대여&반납----------------------------------- -->
+							
                 <div class="row mb-20">
                   <div class="col-sm-12">
                     <div class="product_meta" >태그: <a href="./booklist?searchN=write&searchV=${bookdetail.bkwrite }" >#${bookdetail.bkwrite }</a>

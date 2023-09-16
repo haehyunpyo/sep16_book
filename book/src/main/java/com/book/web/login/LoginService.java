@@ -261,7 +261,7 @@ public class LoginService {
 	          	Nmap.put("Nemail", email);
 	          	Nmap.put("Nname", nickname);
 	          	Nmap.put("Nphone", mobile);
-	            
+	          	
 	            br.close();
 
 	        } catch (Exception e) {
@@ -278,7 +278,7 @@ public class LoginService {
 		return loginDAO.autoCheck(map);
 	}
 
-	public int hasKakaoUser(Map<String, Object> kUser) {
+	public Map<String, Object> hasKakaoUser(Map<String, Object> kUser) {
 		return loginDAO.hasKakaoUser(kUser);
 	}
 
@@ -290,7 +290,7 @@ public class LoginService {
 		return loginDAO.autologin(suserID);
 	}
 
-	public int hasAuto(Map<String, Object> map) {
+	public Map<String, Object> hasAuto(Map<String, Object> map) {
 		return loginDAO.hasAuto(map);
 	}
 

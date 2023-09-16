@@ -93,29 +93,8 @@ function kakaoLogout(){
 	window.location.href = "/logout";
 }
 function naverLogout(){
-	let Npopup = window.open("https://nid.naver.com/nidlogin.logout", "_blank", "width=500, height=500");
-	
-	Npopup.addEventListener("load", function() {
-	    
-		// 팝업 창의 현재 URL 확인
-	    let currentUrl = Npopup.location.href;
-	    
-	    // 원하는 URL 조건에 따라 팝업 창을 닫음
-	    if (currentUrl.includes("www.naver.com")) {
-	        Npopup.close();
-	    }
-	});
-
-	// 팝업 창을 닫는 함수 실행
-	setTimeout(function() {
-	    if (Npopup) {
-	        Npopup.close();
-	    }
-	}, 3000);
-	
-	window.location.href = "/logout";
+	window.location.href = "https://nid.naver.com/nidlogin.logout";
 }
-
 
 	$(function(){
 	
@@ -196,7 +175,6 @@ function naverLogout(){
 
 </script>
 
-
 <!-- --------------------------------------------------- 상단 ---------------------------------------------------------------- -->
 
 </head>
@@ -232,7 +210,7 @@ function naverLogout(){
 		
 	  	<div>
          	<c:choose>
-           		<c:when test="${sessionScope.mid ne null}"> id : ${sessionScope.mid} _ 로그인완</c:when>
+           		<c:when test="${sessionScope.mid ne null}"> name : ${sessionScope.mname} _ 로그인완</c:when>
             	<c:otherwise>로그아웃상태 </c:otherwise>
          	</c:choose>
       	</div>

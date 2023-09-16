@@ -204,10 +204,11 @@ WHERE mid=#{mid} AND cdel = 1
 	
 	
 <!-- SH -->
-	<update id="rental" parameterType="Map">
-		INSERT INTO rental (rsdate, rddate, bkno, rdel, mid)
-		VALUES (#{rsdate}, #{rddate}, #{bkno}, 1, #{mid})
-	</update>	
+<select id="rentaldata" parameterType="Integer" resultType="Map">
+	SELECT *
+	FROM rental
+	WHERE bkno = #{bkno} and rno = (select MAX(rno) FROM rental WHERE bkno = #{bkno})
+</select>
 	
 	
 

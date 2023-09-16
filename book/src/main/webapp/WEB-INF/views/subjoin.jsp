@@ -74,7 +74,7 @@ button{
 	$(function(){
 		
 		$("#joinCancel").click(function(){
-			alert("!");
+			//alert("!");
 			window.location.href = "/logout";
 		});
 		
@@ -115,7 +115,7 @@ window.onload = function(){
 						<div>
 							<c:choose>
            						<c:when test="${mname ne null}">
-           							<input type="text" name="mname" id="mname" value="${mname }" readonly/>
+           							<input type="text" name="mname" id="mname" value="${sessionScope.mname }" readonly/>
            						</c:when>
            						<c:otherwise>
 									<input type="text" name="mname" id="mname" placeholder="이름을 입력해 주세요"/>

@@ -115,6 +115,12 @@ public class BooklistController {
 	    String mid = (String) session.getAttribute("mid");
 	    List<Integer> zzimBooklist = zzimService.zzimBooklist(mid);
 	    model.addAttribute("zzimBooklist", zzimBooklist);
+	    
+	    /*--------------------------------------------------------승현-----------------------------------------------------------*/
+	    // 책대여여부		
+	    Map<String, Object> rentaldata = booklistService.rentaldata(bkno);
+		model.addAttribute("rentaldata", rentaldata);
+		/*-----------------------------------------------------------------------------------------------------------------------*/
 		
 		return "bookdetail";
 	}
@@ -288,10 +294,9 @@ public class BooklistController {
 	
 	
 	
-	
-	
 	/*-----------------------------------------------------------------------------------------------------------------------*/
 	
 	
+
 	
 }

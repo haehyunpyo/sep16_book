@@ -58,6 +58,10 @@
     <link href="assets/css/style.css" rel="stylesheet">
     <link id="color-scheme" href="assets/css/colors/default.css" rel="stylesheet">
     <link href="../css/bookdetail.css" rel="stylesheet">
+    
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script type="text/javascript">
 
     var zHeart1 = false;
@@ -75,87 +79,244 @@
     }
 
     /*--------------------------승현-----------------------------------*/
-
-      //날짜 제한
+//날짜 제한
       $(function () {
+    	  
+    	 	let todayO = new Date();
+		 	let todayA = dateCal(todayO);
+  	  		console.log("todayA : " + todayA)
+    	  
 		 	if(${rentaldata.rdel} == 0){
-			 	let today = new Date();
-			    let dd = String(today.getDate()).padStart(2, '0');
-			    let mm = String(today.getMonth() + 1).padStart(2, '0'); // 1월은 0으로 시작하므로 +1
-			    let yyyy = today.getFullYear();
-			    
-			    today = yyyy + '-' + mm + '-' + dd;
-			
+		 		
 			    // 대여일 입력 필드에 현재 날짜 이후로만 입력하도록 설정
-			    document.getElementById('rsdate').setAttribute('min', today);
+			   document.getElementById('rsdate').setAttribute('min', todayA);
 			    
-		      
 			 // 대여일 입력 이벤트 처리
-			    $("#rsdate").change(function () {
-			        let rsdate = $(this).val(); // 대여일
-			        let rddateInput = $("#rddate");
-			        
-			        if (rsdate) {
-			            let maxRddate = new Date(rsdate);
-			            maxRddate.setDate(maxRddate.getDate() +7); // 대여일로부터 7일 이후
-		
-			            // 반납일 입력 필드에 대여일로부터 7일 이후까지만 입력하도록 설정
-			            let maxRddateStr = formatDate(maxRddate);
-			            rddateInput.attr('max', maxRddateStr);
-			        } else {
-			            // 대여일을 선택하지 않았을 경우 반납일 제한 없음
-			            rddateInput.removeAttr('max');
-			        }
-				    document.getElementById('rddate').setAttribute('min', rsdate);
-			    });
-		
-			    function formatDate(date) {
-			        let dd = String(date.getDate()).padStart(2, '0');
-			        let mm = String(date.getMonth() + 1).padStart(2, '0');
-			        let yyyy = date.getFullYear();
-			        return yyyy + '-' + mm + '-' + dd;
-		    }
+             $("#rsdate").change(function () {
+            	 
+                 let rsdate = $(this).val(); // 대여일
+                 let rddateInput = $("#rddate");
+                 
+                 if (rsdate) {
+                     let maxRddate = new Date(rsdate);
+                     maxRddate.setDate(maxRddate.getDate() +7); // 대여일로부터 7일 이후
+      
+                     // 반납일 입력 필드에 대여일로부터 7일 이후까지만 입력하도록 설정
+                     let maxRddateStr = dateCal(maxRddate);
+                     rddateInput.attr('max', maxRddateStr);
+                 } else {
+                     // 대여일을 선택하지 않았을 경우 반납일 제한 없음
+                     rddateInput.removeAttr('max');
+                 }
+                document.getElementById('rddate').setAttribute('min', rsdate);
+             });
+
 			    
+			 // if끝
 	 		} else {
-	 			let rddateStr = '${rentaldata.rddate}'; // 예: "2023-09-18"
-	 			let rddate = new Date(rddateStr);
-			    let dd = String(rddate.getDate()).padStart(2, '0');
-			    let mm = String(rddate.getMonth() + 1).padStart(2, '0'); // 1월은 0으로 시작하므로 +1
-			    let yyyy = rddate.getFullYear();
+	 			
+	 			// 기존대여일
+                let rsdateStr = '${rentaldata.rsdate}';
+                let rsdateO = new Date(rsdateStr);
+                rsdateA = dateCal(rsdateO); //2023-09-26
+                console.log("rsdateA : " + rsdateA);
+	 			
+                // 기존반납일
+                let rddateStr = '${rentaldata.rddate}'; // 예: "2023-09-18"
+                let rddateO = new Date(rddateStr);
+                rddateA = dateCal(rddateO);
+                console.log("rddateA : " + rddateA);
+
+
+                // 오늘날짜
+                console.log("todayO : " + todayO);
+                console.log("todayA : " + todayA);
+				
+                // 오늘날짜 + 7
+                let today7A = datePlus(todayO, 7);
+                let today7O = new Date(today7A);
+                console.log("today7A : " + today7A); 
+                console.log("today7O : " + today7O); 
+                
+                // else _ if시작
+                if(rsdateO > today7O){
+                    // 대여일 입력 필드에 현재 날짜 이후로만 입력하도록 설정
+                    document.getElementById('rsdate').setAttribute('min', today7A);
+                    let gapDateA = dateMinus(rddateO, 8);
+                    gapDateO = new Date(gapDateA);
+                    console.log(todayO <= gapDateO)
+                    	
+                       addDisable(gapDateO, rddateO); // 매개변수는 Date()객체
+                       
+                       function addDisable(startDate, endDate){	 // rddate-7부터 rsdate가 disabled
+   							let disableArr = [];
+   					    	while (startDate <= endDate) {
+   					    	let disableDate = new Date();
+   					    	disableDate.setDate(startDate.getDate() + 1);
+   					    	disableArr.push(dateCal(disableDate));
+   					    }
+   					 	console.log("disableArr : " + disableArr);
+                       
+                 /*       	for (let i=0; i < plusDate; i++){
+                       		let disableDate = new Date();	// Obj
+                       		disableDate.setDate(startDate.getDate() + i);
+                         	console.log(typeof dateCal(disableDate));	// String
+                       		disableArr.push(dateCal(disableDate));
+                       		//console.log(typeof disableArr);
+                       	}
+                       		console.log("disableArr : " + disableArr);  */
+                       } 
+                       
+                       
+                       // 대여일 입력 이벤트 처리
+                       $("#rsdate").change(function () {
+                           let rsdate = $(this).val(); // 대여일
+                           let rddateInput = $("#rddate");
+                           
+                           if (rsdate) {
+                               let maxRddate = new Date(rsdate);
+                               maxRddate.setDate(maxRddate.getDate() +7); // 대여일로부터 7일 이후
+                
+                               // 반납일 입력 필드에 대여일로부터 7일 이후까지만 입력하도록 설정
+                               let maxRddateStr = dateCal(maxRddate);
+                               rddateInput.attr('max', maxRddateStr);
+                           } else {
+                               // 대여일을 선택하지 않았을 경우 반납일 제한 없음
+                               rddateInput.removeAttr('max');
+                           }
+                          document.getElementById('rddate').setAttribute('min', rsdate);
+                       });
+                       
+                 // else _ else if시작     
+                }  else if(rsdateO < today7O) {
+                	
+                    // 대여일 입력 필드에 현재 날짜 이후로만 입력하도록 설정
+                    document.getElementById('rsdate').setAttribute('min', rddateA);
+
 			    
-			    rddate = yyyy + '-' + mm + '-' + dd;
+                // 대여일 입력 이벤트 처리
+                $("#rsdate").change(function () {
+                    let rsdate = $(this).val(); // 대여일
+                    let rddateInput = $("#rddate");
+                    
+                    if (rsdate) {
+                        let maxRddate = new Date(rsdate);
+                        maxRddate.setDate(maxRddate.getDate() +7); // 대여일로부터 7일 이후
+
+                        // 반납일 입력 필드에 대여일로부터 7일 이후까지만 입력하도록 설정
+                        let maxRddateStr = formatDate(maxRddate);
+                        rddateInput.attr('max', maxRddateStr);
+                    } else {
+                        // 대여일을 선택하지 않았을 경우 반납일 제한 없음
+                        rddateInput.removeAttr('max');
+                    }
+                   document.getElementById('rddate').setAttribute('min', rsdate);
+                });
+
+
+			   
+                }// else _ else끝
+                
+	 		} // esle끝
+
+		 	
+  	});
+		// ===========추가함수시작====================
+
+		 // 날짜형식으로 변환해주는 함수		
+			function dateCal(date){	// 매개변수는 Date객체
+	 			
+			    let mm = String(date.getMonth() + 1).padStart(2, '0'); // 1월은 0으로 시작하므로 +1
+			    let dd = String(date.getDate()).padStart(2, '0');
+			    let yyyy = date.getFullYear();
+			    let Fdate = yyyy + '-' + mm + '-' + dd;
+			    
+				//console.log("Fdate최종형태 : " + Fdate);
+
+			    return Fdate;	// 
+			}
 			
-			    // 대여일 입력 필드에 현재 날짜 이후로만 입력하도록 설정
-			    document.getElementById('rsdate').setAttribute('min', rddate);
+			// 날짜계산함수(plus)
+			function datePlus(date, plus){   // 매개변수는 (Date객체, 일자)
+
+				let mm = date.getMonth() + 1; // 현재 월
+				let dd = date.getDate() + plus;  // 현재 일에 7일을 더함
+				let yyyy = date.getFullYear(); // 현재 연도
 			    
-		      
-			 // 대여일 입력 이벤트 처리
-			    $("#rsdate").change(function () {
-			        let rsdate = $(this).val(); // 대여일
-			        let rddateInput = $("#rddate");
-			        
-			        if (rsdate) {
-			            let maxRddate = new Date(rsdate);
-			            maxRddate.setDate(maxRddate.getDate() +7); // 대여일로부터 7일 이후
+			    if (mm > 12) {
+				    yyyy += 1;
+				    mm = 1;
+				}
 
-			            // 반납일 입력 필드에 대여일로부터 7일 이후까지만 입력하도록 설정
-			            let maxRddateStr = formatDate(maxRddate);
-			            rddateInput.attr('max', maxRddateStr);
-			        } else {
-			            // 대여일을 선택하지 않았을 경우 반납일 제한 없음
-			            rddateInput.removeAttr('max');
+				// 일(Day)이 월에 따라 30 또는 31일을 넘어가는 경우 월(Month)을 변경하고 일(Day)을 1로 설정
+				if ((mm === 4 || mm === 6 || mm === 9 || mm === 11) && dd > 30) {
+				    mm += 1;
+				    dd = 1;
+				} else if (mm === 2) {
+				    // 2월은 윤년 여부에 따라 28일 또는 29일까지 있으므로 윤년 여부를 고려하여 처리
+				    if ((yyyy % 4 === 0 && yyyy % 100 !== 0) || (yyyy % 400 === 0)) {
+				        if (dd > 29) {
+				            mm += 1;
+				            dd = 1;
+				        }
+				    } else {
+				        if (dd > 28) {
+				            mm += 1;
+				            dd = 1;
+				        }
+				    }
+				} else if (dd > 31) {
+				    mm += 1;
+				    dd = 1;
+				}
+				
+				// 날짜를 문자열로 변환
+				let plusDate = yyyy + '-' + String(mm).padStart(2, '0') + '-' + String(dd).padStart(2, '0');
+				//console.log("plusDate최종형태 : " + plusDate)
+
+			    return plusDate;
+			}
+			
+			
+			// 날짜계산함수(minus)
+			function dateMinus(date, minus) {
+			    let yyyy = date.getFullYear();
+			    let mm = date.getMonth() + 1;
+			    let dd = date.getDate() - minus;
+			
+			    while (dd < 1) {
+			        mm -= 1;
+			
+			        if (mm < 1) {
+			            yyyy -= 1;
+			            mm = 12;
 			        }
-				    document.getElementById('rddate').setAttribute('min', rsdate);
-			    });
+			
+			        if (mm === 4 || mm === 6 || mm === 9 || mm === 11) {
+			            dd += 30;
+			        } else if (mm === 2) {
+			            if ((yyyy % 4 === 0 && yyyy % 100 !== 0) || (yyyy % 400 === 0)) {
+			                dd += 29;
+			            } else {
+			                dd += 28;
+			            }
+			        } else {
+			            dd += 31;
+			        }
+			    }
+			
+			    let minusDate = yyyy + '-' + String(mm).padStart(2, '0') + '-' + String(dd).padStart(2, '0');
+			    return minusDate;
+			}
+			
+			// ===========추가함수끝====================
+	 		
+	 		
+	 		
 
-			    function formatDate(date) {
-			        let dd = String(date.getDate()).padStart(2, '0');
-			        let mm = String(date.getMonth() + 1).padStart(2, '0');
-			        let yyyy = date.getFullYear();
-			        return yyyy + '-' + mm + '-' + dd;
-	 			}
-	 		}
-	});
+    
+    
+    
     
 	 //책 대여
       $(function(){
@@ -167,7 +328,7 @@
       
         	//alert(rsddate, rddate);
 
-        if (rsdate === "" && rddate === "") {
+          if (rsdate === "" && rddate === "") {
             alert("날짜를 입력하세요.");
         } else if (rsdate === "") {
             alert("대여일을 입력하세요.");
@@ -226,10 +387,6 @@
               });
     	 }); 
     });
-     
-     /*-----------------------------------------------------------------*/
-
-     
    </script>
 
 
@@ -306,17 +463,13 @@
 									<div class="tab-pane" id="trade">
 										<c:if test="${rentaldata.rdel eq 0 }">
 											<div class="col-sm-6 mb-sm-20">
-												대여일<input class="form-control input-lg" type="date"
-													id="rsdate" name="rsdate" required="required" />
+												대여일<input class="form-control input-lg" type="date" id="rsdate" name="rsdate" required="required" />
 											</div>
 											<div class="col-sm-6 mb-sm-20">
-												반납일<input class="form-control input-lg" type="date"
-													id="rddate" name="rddate" required="required" />
+												반납일<input class="form-control input-lg" type="date" id="rddate" name="rddate" required="required" />
 											</div>
-											<div class="col-sm-12">
-												<br>
-												<a class="btn btn-lg btn-block btn-round btn-b" href="#"
-													id="rental">대여하기</a>
+											<div class="col-sm-12"><br>
+												<a class="btn btn-lg btn-block btn-round btn-b" href="#" id="rental">대여하기</a>
 											</div>
 										</c:if>
 
@@ -325,32 +478,26 @@
 											<div>${rentaldata.rddate }일이후부터 대여가능</div>
 
 											<div class="col-sm-6 mb-sm-20">
-												대여일<input class="form-control input-lg" type="date"
-													id="rsdate" name="rsdate" required="required" />
+												대여일<input class="form-control input-lg" type="date" id="rsdate" name="rsdate" required="required" />
 											</div>
 											<div class="col-sm-6 mb-sm-20">
-												반납일<input class="form-control input-lg" type="date"
-													id="rddate" name="rddate" required="required" />
+												반납일<input class="form-control input-lg" type="date" id="rddate" name="rddate" required="required" />
 											</div>
-											<div class="col-sm-12">
-												<br>
-												<a class="btn btn-lg btn-block btn-round btn-b" href="#"
-													id="rental">대여하기</a>
+											<div class="col-sm-12"><br>
+												<a class="btn btn-lg btn-block btn-round btn-b" href="#" id="rental">대여하기</a>
 											</div>
-											<c:if
-												test="${rentaldata.rdel == 1 && sessionScope.mid == rentaldata.mid}">
-												<div class="col-sm-12">
-													<br>
-													<a class="btn btn-lg btn-block btn-round btn-b" href="#"
-														id="returnBook">반납하기</a>
+											<c:if test="${rentaldata.rdel == 1 && sessionScope.mid == rentaldata.mid}">
+												<div class="col-sm-12"><br>
+													<a class="btn btn-lg btn-block btn-round btn-b" href="#" id="returnBook">반납하기</a>
 												</div>
 											</c:if>
+											
 										</c:if>
 									</div>
 
 								</div>
 							</div> 
-	<!-- --------------------------대여&반납----------------------------------- -->
+	<!-- ------------------------------------------------------------------- -->
 							
                 <div class="row mb-20">
                   <div class="col-sm-12">
